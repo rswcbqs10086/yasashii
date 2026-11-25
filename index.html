@@ -1,0 +1,1333 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#eef2f6">
+<meta name="description" content="这里不会催你。往下滑，它会一点点变得温柔。">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E%F0%9F%A4%8D%3C/text%3E%3C/svg%3E">
+<title>温柔 — 欢迎回来</title>
+<style>
+  /* ===============================================================
+     やさしい / Yasashii
+     ひとつの HTML ファイルだけで動きます（外部ファイルなし・オフライン可）
+     =============================================================== */
+  :root{
+    --p: 0;
+    --cute: 0;
+    --c-bg: #eef2f6;
+    --c-ink: #2a3340;
+    --c-muted: #6d7887;
+    --c-card: #ffffff;
+    --c-accent: #64758a;
+    --c-soft: #d8e0e8;
+    --c-line: rgba(20,30,45,.10);
+    --shadow: 0 18px 50px rgba(40,55,75,.10);
+    --nav-bg: rgba(255,255,255,.72);
+    --maxw: 720px;
+    --pad: clamp(18px, 5vw, 44px);
+    --r: 18px;
+    --font-jp: "Hiragino Maru Gothic ProN","Hiragino Kaku Gothic ProN","Yu Gothic UI","Yu Gothic",
+               "Noto Sans JP","Yuanti SC","PingFang SC","Microsoft YaHei",system-ui,-apple-system,sans-serif;
+  }
+  *{ box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html{ scroll-behavior: smooth; }
+  body{
+    margin:0; padding:0;
+    font-family: var(--font-jp);
+    background: var(--c-bg);
+    color: var(--c-ink);
+    line-height: 1.95;
+    letter-spacing: .015em;
+    overflow-x: hidden;
+    transition: background-color .35s linear, color .35s linear;
+    -webkit-font-smoothing: antialiased;
+  }
+  body::before{
+    /* 整体柔和的光，越向下越暖 */
+    content:""; position: fixed; inset:-10%;
+    pointer-events:none; z-index:0;
+    background:
+      radial-gradient(60% 42% at 85% 6%, rgba(255,255,255,.55), transparent 60%),
+      radial-gradient(50% 40% at 12% 30%, color-mix(in srgb, var(--c-accent) 12%, transparent), transparent 70%),
+      radial-gradient(70% 50% at 70% 92%, color-mix(in srgb, var(--c-accent) 10%, transparent), transparent 72%);
+    opacity: calc(.55 + var(--cute) * .45);
+  }
+  img,svg{ display:block; max-width:100%; }
+  a{ color: inherit; }
+
+  /* ---------- 上部の細い進捗バー ---------- */
+  .progress{ position: fixed; top:0; left:0; right:0; height:3px; z-index:60; background: transparent; }
+  .progress i{
+    display:block; height:100%; width:0%;
+    background: linear-gradient(90deg, var(--c-accent), color-mix(in srgb, var(--c-accent) 40%, #ffffff));
+    transition: background .3s linear;
+  }
+
+  /* ---------- ナビ ---------- */
+  .nav{
+    position: fixed; z-index:50; top: 12px; left: 50%; transform: translateX(-50%);
+    width: min(calc(100% - 22px), var(--maxw));
+    display:flex; align-items:center; gap:10px;
+    padding: 9px 12px;
+    background: var(--nav-bg);
+    border: 1px solid var(--c-line);
+    border-radius: 999px;
+    backdrop-filter: blur(14px) saturate(1.2);
+    -webkit-backdrop-filter: blur(14px) saturate(1.2);
+    box-shadow: 0 8px 30px rgba(50,60,80,.08);
+    transition: background .3s linear, border-color .3s linear;
+  }
+  .brand{ display:flex; align-items:center; gap:7px; font-weight:700; letter-spacing:.06em; font-size:14px; }
+  .brand svg{ width:20px; height:20px; color: var(--c-accent); }
+  .nav .links{ display:none; gap:16px; margin-left:auto; font-size:12.5px; color: var(--c-muted); }
+  .nav .links a{ text-decoration:none; }
+  .nav .links a:hover{ color: var(--c-accent); }
+  .nav .spacer{ margin-left:auto; }
+  .nav .voice-fab{ margin-left:auto; }
+  .sound{
+    margin-left:auto; border:1px solid var(--c-line); background: transparent; color: var(--c-muted);
+    border-radius:999px; padding:6px 12px; font: inherit; font-size:12px; cursor:pointer;
+    display:flex; align-items:center; gap:6px; min-height: 32px;
+  }
+  .sound.on{ color: #fff; background: var(--c-accent); border-color: transparent; }
+  @media (min-width: 640px){
+    .nav .links{ display:flex; }
+    .sound{ margin-left: 4px; }
+    .nav .spacer{ display:none; }
+  }
+
+  /* ---------- レイアウト ---------- */
+  main{ position: relative; z-index: 2; }
+  .wrap{ width: min(100%, var(--maxw)); margin-inline:auto; padding-inline: var(--pad); }
+  section{ position: relative; padding-block: clamp(56px, 11vw, 120px); scroll-margin-top: 78px; }
+  .eyebrow{
+    display:inline-flex; align-items:center; gap:8px;
+    font-size: 11.5px; letter-spacing:.16em; text-transform: uppercase;
+    color: var(--c-muted); margin: 0 0 16px;
+  }
+  .eyebrow::before{ content:""; width:22px; height:1px; background: currentColor; opacity:.5; }
+  h1,h2,h3,p{ margin:0; }
+  h1 .jp-sub{ font-size: .3em; margin-top: 12px; letter-spacing:.08em; }
+  h2 .jp-sub{ font-size: .42em; margin-top: 9px; letter-spacing:.06em; }
+  h1{
+    font-size: clamp(40px, 12.5vw, 76px);
+    line-height: 1.18; letter-spacing:.02em; font-weight: 700;
+  }
+  h2{
+    font-size: clamp(26px, 7.4vw, 42px);
+    line-height: 1.42; font-weight: 700; letter-spacing:.01em;
+  }
+  h3{ font-size: clamp(16px, 4.4vw, 19px); line-height:1.6; font-weight:700; }
+  .lead{ font-size: clamp(14.5px, 3.9vw, 17px); color: var(--c-muted); line-height: 2.1; max-width: 34em; }
+  .zh{ display:block; font-size: .78em; line-height:1.75; color: var(--c-muted); letter-spacing:.03em; opacity:.92; }
+  .jp-sub{ display:block; margin-top: 6px; font-size: .66em; font-weight: 400; line-height: 1.9;
+           letter-spacing:.03em; color: var(--c-muted); opacity:.88; }
+  .tiny{ font-size: 12px; line-height:1.9; color: var(--c-muted); }
+  .center{ text-align:center; }
+  .mt-s{ margin-top: 14px; } .mt-m{ margin-top: 28px; } .mt-l{ margin-top: 48px; }
+
+  /* ---------- ボタン ---------- */
+  .btn{
+    display:inline-flex; align-items:center; justify-content:center; gap:8px;
+    min-height: 48px; padding: 12px 22px;
+    border-radius: 999px; border: 0; cursor:pointer;
+    font: inherit; font-size: 14.5px; font-weight:700; letter-spacing:.03em;
+    background: var(--c-ink); color: #fff; text-decoration:none;
+    transition: transform .25s cubic-bezier(.2,.9,.2,1), background .3s linear, box-shadow .3s;
+    box-shadow: 0 10px 26px color-mix(in srgb, var(--c-ink) 18%, transparent);
+  }
+  .btn:active{ transform: scale(.97); }
+  .btn.ghost{
+    background: transparent; color: var(--c-ink);
+    border: 1px solid var(--c-line); box-shadow:none;
+  }
+  .btn.small{ min-height: 40px; padding: 8px 16px; font-size: 13px; }
+  .row{ display:flex; flex-wrap:wrap; gap:12px; align-items:center; }
+
+  /* ---------- カード ---------- */
+  .card{
+    background: var(--c-card);
+    border: 1px solid var(--c-line);
+    border-radius: calc(var(--r) + var(--cute) * 16px);
+    padding: clamp(18px, 5vw, 28px);
+    box-shadow: var(--shadow);
+    transition: background .35s linear, border-radius .35s linear, box-shadow .35s;
+  }
+  .grid{ display:grid; gap: 14px; }
+  @media (min-width: 620px){ .grid.two{ grid-template-columns: 1fr 1fr; } .grid.three{ grid-template-columns: repeat(3,1fr);} }
+
+  /* ---------- ヒーロー ---------- */
+  .hero{ padding-top: clamp(96px, 20vw, 150px); padding-bottom: clamp(60px, 12vw, 110px); }
+  .hero .kicker{ font-size: 12px; letter-spacing:.18em; color: var(--c-muted); }
+  .hero h1{ margin-top: 10px; }
+  .hero .lead{ margin-top: 20px; }
+  .hero-actions{ margin-top: 30px; }
+  .scrollhint{
+    margin-top: 34px; display:flex; align-items:center; gap:8px;
+    font-size: 11px; letter-spacing:.22em; color: var(--c-muted);
+  }
+  .scrollhint svg{ width:16px; height:16px; animation: bob 2.6s ease-in-out infinite; }
+  @keyframes bob{ 0%,100%{ transform: translateY(-2px);} 50%{ transform: translateY(4px);} }
+  .hero-orn{ position:absolute; inset:0; pointer-events:none; overflow:hidden; }
+  .hero-orn svg{ position:absolute; color: var(--c-accent); opacity:.5; }
+  .o1{ width:86px; top: 78px; right: -18px; animation: drift 11s ease-in-out infinite; }
+  .o2{ width:54px; top: 210px; left: -14px; opacity:.35 !important; animation: drift 9s ease-in-out infinite reverse; }
+  .o3{ width:34px; top: 330px; right: 26px; opacity:.3 !important; animation: twinkle 5s ease-in-out infinite; }
+  .o4{ width:120px; bottom: -20px; left: -30px; opacity:.18 !important; }
+
+  /* 今日のカード */
+  .today{ margin-top: 42px; display:grid; gap:1px; overflow:hidden; border-radius: calc(var(--r) + var(--cute)*14px); }
+  .today .head{ display:flex; align-items:center; gap:10px; font-size:13.5px; }
+  .today .dot{ width:8px; height:8px; border-radius:50%; background:#7ec8a0; box-shadow:0 0 0 4px rgba(126,200,160,.18); }
+  .today .rows{ display:grid; grid-template-columns: repeat(3,1fr); gap:1px; background: var(--c-line); border-radius: 14px; overflow:hidden; margin-top:16px; }
+  .today .rows div{ background: var(--c-card); padding: 14px 10px; }
+  .today .rows b{ display:block; font-size: 15px; }
+  .today .rows span{ font-size: 11px; color: var(--c-muted); letter-spacing:.06em; }
+
+  /* ---------- 名前の帯 ---------- */
+  .bands{ opacity:.9; }
+  .chip{
+    display:inline-flex; align-items:center; gap:6px;
+    padding: 7px 13px; border-radius: 999px; font-size:12.5px;
+    border: 1px solid var(--c-line); color: var(--c-muted); background: color-mix(in srgb, var(--c-card) 70%, transparent);
+  }
+  .chips{ display:flex; flex-wrap:wrap; gap:8px; justify-content:center; }
+
+  /* ---------- タイムライン ---------- */
+  .tl{ position:relative; margin-top: 34px; padding-left: 22px; }
+  .tl::before{ content:""; position:absolute; left:6px; top:6px; bottom:6px; width:1px; background: linear-gradient(var(--c-soft), color-mix(in srgb, var(--c-accent) 45%, transparent)); }
+  .tl-item{ position:relative; padding: 10px 0 10px 8px; }
+  .tl-item::before{
+    content:""; position:absolute; left:-22px; top: 24px; width:11px; height:11px; border-radius:50%;
+    background: var(--c-card); border:1.5px solid var(--c-accent);
+  }
+  .tl-item time{ font-variant-numeric: tabular-nums; font-size:12px; letter-spacing:.14em; color: var(--c-accent); }
+  .tl-item p{ font-size: 15px; margin-top:2px; }
+
+  /* ---------- 声のカード ---------- */
+  .voice{ display:flex; gap:14px; align-items:flex-start; }
+  .avatar{
+    flex:0 0 auto; width:46px; height:46px; border-radius:50%;
+    display:grid; place-items:center;
+    background: color-mix(in srgb, var(--c-accent) 12%, var(--c-card));
+    color: var(--c-accent);
+  }
+  .avatar svg{ width:28px; height:28px; }
+  .voice{ align-items: flex-start; }
+  .voice .avatar{ font-size: 14px; font-weight: 700; letter-spacing:.04em; }
+  .voice .name{ font-size: 11px; letter-spacing:0; }
+  .voice p{ font-size: 15.5px; line-height: 1.8; }
+  .voice p .jp-sub{ font-size: .72em; margin-top: 4px; opacity:.8; }
+  .voice .name{ font-size: 11.5px; letter-spacing:.1em; color: var(--c-muted); margin-top: 8px; }
+
+  /* ---------- 大きな数字 ---------- */
+  .nums{ display:grid; grid-template-columns: 1fr 1fr; gap:12px; margin-top: 30px; }
+  .num b{ display:block; font-size: clamp(30px, 9vw, 44px); line-height:1.1; font-variant-numeric: tabular-nums; }
+  .num span{ font-size: 12px; color: var(--c-muted); letter-spacing:.06em; }
+
+  /* ---------- 呼吸 ---------- */
+  .cozy{ cursor:pointer; max-width: 460px; margin-inline:auto; }
+  .cozy svg{ filter: drop-shadow(0 18px 40px color-mix(in srgb, var(--c-accent) 22%, transparent)); }
+  .breath-wrap{ display:grid; place-items:center; gap: 22px; margin-top: 34px; }
+  .breath{
+    position:relative; width: min(68vw, 280px); aspect-ratio:1; border-radius:50%;
+    display:grid; place-items:center; cursor:pointer; border:0; background:transparent; padding:0;
+    --s: .72;
+    touch-action: manipulation;
+  }
+  .breath .halo{
+    position:absolute; inset:0; border-radius:50%;
+    background: radial-gradient(circle at 50% 42%,
+      color-mix(in srgb, var(--c-accent) 46%, #fff),
+      color-mix(in srgb, var(--c-accent) 26%, transparent) 58%,
+      transparent 76%);
+    transform: scale(var(--s));
+    transition: transform 1.2s ease-in-out;
+  }
+  .breath .ring{
+    position:absolute; inset:0; border-radius:50%;
+    border:1px solid color-mix(in srgb, var(--c-accent) 40%, transparent);
+    transform: scale(calc(var(--s) + .06));
+    transition: transform 1.2s ease-in-out;
+  }
+  .breath .ring2{
+    position:absolute; inset:9%; border-radius:50%;
+    border:1px dashed color-mix(in srgb, var(--c-accent) 34%, transparent);
+    transform: scale(var(--s));
+    transition: transform 1.2s ease-in-out;
+    animation: spin 26s linear infinite;
+  }
+  @keyframes spin{ to{ transform: rotate(360deg); } }
+  .breath .label{
+    position:relative; font-size: 14px; letter-spacing:.1em; color: var(--c-ink);
+    text-align:center; line-height:1.7;
+  }
+  .breath .label small{ display:block; font-size:11px; color: var(--c-muted); letter-spacing:.08em; }
+
+  /* ---------- 料金（逆・全部無料） ---------- */
+  .price b{ font-size: clamp(28px, 8vw, 40px); }
+  .price .tag{ font-size:11px; letter-spacing:.14em; text-transform:uppercase; color: var(--c-accent); }
+
+  /* ---------- 動物チーム ---------- */
+  .team{ display:grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 28px; }
+  .team .card{ padding: 18px 12px; text-align:center; }
+  .team svg{ width: 56px; height:56px; margin: 0 auto 10px; color: var(--c-accent); }
+  .team b{ display:block; font-size: 13.5px; }
+  .team span{ font-size: 11px; color: var(--c-muted); }
+
+  /* ---------- しつもん ---------- */
+  details{ border-bottom: 1px solid var(--c-line); padding: 16px 2px; }
+  details summary{ cursor:pointer; list-style:none; font-size: 15px; font-weight:700; display:flex; gap:10px; align-items:flex-start; }
+  details summary::-webkit-details-marker{ display:none; }
+  details summary::after{ content:"＋"; margin-left:auto; color: var(--c-accent); font-weight:400; }
+  details[open] summary::after{ content:"−"; }
+  details p{ margin-top: 10px; font-size: 14px; color: var(--c-muted); padding-left: 26px; }
+
+  /* ---------- ことばのポスト ---------- */
+  .post{ margin-top: 26px; display:grid; gap:10px; }
+  textarea{
+    width:100%; min-height: 96px; resize: vertical; padding: 14px 16px;
+    font: inherit; font-size: 14px; line-height:1.8;
+    color: var(--c-ink); background: var(--c-card);
+    border: 1px solid var(--c-line); border-radius: 16px; outline: none;
+  }
+  textarea:focus{ border-color: color-mix(in srgb, var(--c-accent) 55%, transparent); }
+  .reply{ font-size: 13px; color: var(--c-accent); min-height: 22px; }
+
+  /* ---------- フッター ---------- */
+  footer{ position:relative; z-index:2; padding: 60px var(--pad) 70px; text-align:center; }
+  footer .heartline{ font-size: 15px; }
+  footer .tiny{ margin-top: 10px; }
+
+  /* ---------- 貼り紙（少しずつ増える） ---------- */
+  .deco{ position:absolute; pointer-events:none; color: var(--c-accent); opacity: calc(.10 + var(--cute)*.5); }
+  .deco svg{ width:100%; }
+  .fl{ animation: drift 9s ease-in-out infinite; }
+  .fl2{ animation: drift 12s ease-in-out infinite reverse; }
+  .tw{ animation: twinkle 4.5s ease-in-out infinite; }
+
+  @keyframes drift{ 0%,100%{ transform: translateY(0) rotate(0deg);} 50%{ transform: translateY(-12px) rotate(3.5deg);} }
+  @keyframes twinkle{ 0%,100%{ opacity:.25; transform: scale(.94);} 50%{ opacity:.9; transform: scale(1.06);} }
+  @keyframes floatUp{ 0%{ opacity:0; transform: translateY(8px) scale(.9);} 15%{opacity:1;} 100%{ opacity:0; transform: translateY(-90px) scale(1.1);} }
+  @keyframes popIn{ 0%{ transform: scale(.6); opacity:0;} 60%{ transform: scale(1.06); opacity:1;} 100%{ transform: scale(1); opacity:1;} }
+
+  /* ---------- 出現アニメ ---------- */
+  .reveal{ opacity:0; transform: translateY(20px); transition: opacity .9s cubic-bezier(.2,.8,.2,1), transform .9s cubic-bezier(.2,.8,.2,1); }
+  .reveal.in{ opacity:1; transform:none; }
+  .reveal.d1{ transition-delay:.08s } .reveal.d2{ transition-delay:.16s } .reveal.d3{ transition-delay:.24s }
+
+  /* ---------- タップで出る心 ---------- */
+  .tapheart{
+    position: fixed; z-index:70; pointer-events:none;
+    font-size: 20px; color: var(--c-accent);
+    animation: floatUp 1.8s ease-out forwards;
+  }
+  .tapnote{
+    position: fixed; z-index:70; pointer-events:none; max-width: 62vw;
+    padding: 9px 14px; border-radius: 16px;
+    background: color-mix(in srgb, var(--c-card) 92%, transparent);
+    border: 1px solid var(--c-line); box-shadow: 0 10px 26px rgba(60,70,90,.12);
+    font-size: 12.5px; color: var(--c-ink); line-height:1.7;
+    animation: floatUp 2.6s ease-out forwards;
+  }
+  .phrases{ margin-top: 22px; display:flex; flex-wrap:wrap; gap:8px; justify-content:center; }
+
+  /* ---------- ことばの壁 ---------- */
+  .wall{ display:flex; flex-wrap:wrap; gap:9px; justify-content:center; margin-top: 30px; }
+  .wall span{
+    display:inline-block; padding: 9px 15px; border-radius: 999px;
+    background: color-mix(in srgb, var(--c-card) 92%, transparent);
+    border: 1px solid var(--c-line);
+    font-size: 13px; line-height: 1.4; color: var(--c-ink);
+    box-shadow: 0 6px 18px rgba(90,70,80,.06);
+    transform: rotate(-1.6deg) translateY(0);
+    transition: transform .4s cubic-bezier(.2,.9,.2,1), background .3s;
+  }
+  .wall span:nth-child(3n){ transform: rotate(1.8deg); }
+  .wall span:nth-child(4n){ transform: rotate(-2.6deg); font-size: 12px; }
+  .wall span:nth-child(5n){ transform: rotate(2.2deg); font-size: 14px; }
+  .wall span:hover{ transform: rotate(0deg) translateY(-3px) scale(1.04); }
+
+
+  /* ---------- こえ（読み上げ） ---------- */
+  .voice{ position: relative; }
+  .speak{
+    position:absolute; bottom:12px; right:12px; width:36px; height:36px; border-radius:50%;
+    display:grid; place-items:center; cursor:pointer;
+    border:1px solid var(--c-line);
+    background: color-mix(in srgb, var(--c-accent) 12%, var(--c-card));
+    color: var(--c-accent); font-size: 13px; line-height:1;
+    transition: transform .2s, background .2s, color .2s;
+  }
+  .speak:active{ transform: scale(.9); }
+  .speak.playing{ background: var(--c-accent); color:#fff; border-color:transparent; }
+
+  .voice-fab{
+    display:flex; align-items:center; gap:7px;
+    padding: 6px 12px; border-radius: 999px; cursor:pointer;
+    border:1px solid var(--c-line); background: transparent; color: var(--c-muted);
+    font-family: inherit; font-size: 12px; font-weight: 700; min-height: 32px;
+    transition: background .3s, color .3s, transform .2s;
+  }
+  .voice-fab:active{ transform: scale(.97); }
+  .voice-fab .dot{ width:7px; height:7px; border-radius:50%; background:#c9cfd8; transition: background .3s, box-shadow .3s; }
+  .voice-fab.on{ color:#fff; background: var(--c-accent); border-color: transparent; }
+  .voice-fab.on .dot{ background:#fff; box-shadow: 0 0 0 3px rgba(255,255,255,.25); }
+  .voice-fab:active{ transform: scale(.97); }
+  .voice-fab .dot{ width:8px; height:8px; border-radius:50%; background:#c9cfd8; transition: background .3s, box-shadow .3s; }
+  .voice-fab.on{ color:#fff; background: var(--c-accent); border-color: transparent; }
+  .voice-fab.on .dot{ background:#bff0cf; box-shadow: 0 0 0 4px rgba(255,255,255,.22); }
+
+  .chip-soft{
+    display:inline-block; padding: 9px 15px; border-radius: 999px;
+    background: color-mix(in srgb, var(--c-card) 92%, transparent);
+    border: 1px solid var(--c-line); font-size: 13px; color: var(--c-ink);
+    box-shadow: 0 6px 18px rgba(90,70,80,.06);
+  }
+  .wall button{
+    display:inline-block; padding: 9px 15px; border-radius: 999px;
+    background: color-mix(in srgb, var(--c-card) 92%, transparent);
+    border: 1px solid var(--c-line); font-family: inherit; font-size: 13px; line-height:1.4;
+    color: var(--c-ink); cursor:pointer; -webkit-appearance:none;
+    box-shadow: 0 6px 18px rgba(90,70,80,.06);
+    transform: rotate(-1.6deg);
+    transition: transform .4s cubic-bezier(.2,.9,.2,1), background .3s;
+  }
+  .wall button:nth-child(3n){ transform: rotate(1.8deg); }
+  .wall button:nth-child(4n){ transform: rotate(-2.6deg); font-size: 12px; }
+  .wall button:nth-child(5n){ transform: rotate(2.2deg); font-size: 14px; }
+  .wall button:active{ transform: rotate(0) scale(.96); }
+
+
+  /* ---------- 中文字幕 ---------- */
+  .subtitle{
+    position: fixed; left: 50%; bottom: 18px; transform: translate(-50%, 16px);
+    z-index: 58; width: min(92%, 430px);
+    padding: 12px 18px 13px; border-radius: 20px;
+    background: rgba(255,255,255,.88);
+    backdrop-filter: blur(14px) saturate(1.3); -webkit-backdrop-filter: blur(14px) saturate(1.3);
+    border: 1px solid rgba(120,100,110,.14);
+    box-shadow: 0 16px 44px rgba(90,60,70,.18);
+    text-align: center; opacity: 0; pointer-events: none;
+    transition: opacity .35s ease, transform .35s cubic-bezier(.2,.9,.2,1);
+  }
+  .subtitle.show{ opacity: 1; transform: translate(-50%, 0); }
+  .subtitle .jp{ display:block; margin-top: 4px; font-size: 11.5px; color: var(--c-muted); line-height:1.6; letter-spacing:.02em; }
+  .subtitle .zh-line{ display:block; font-size: 16px; font-weight: 700; color: var(--c-ink); line-height:1.55; }
+
+  .h1zh{ display:block; margin-top: 10px; font-size: 15px; font-weight: 400; letter-spacing:.08em; color: var(--c-muted); }
+  h2 .zh-sub{ display:block; margin-top: 8px; font-size: 13px; font-weight: 400; letter-spacing:.04em; color: var(--c-muted); line-height:1.7; }
+  .kicker .zh-k{ display:block; margin-top:6px; font-size: 11.5px; letter-spacing:.05em; color: var(--c-muted); opacity:.9; }
+  .zhnum{ display:block; font-style: normal; font-size: 11px; color: var(--c-muted); margin-top: 3px; letter-spacing:.02em; }
+
+
+  /* ---------- 署名・ウォーターマーク ---------- */
+  .sign{
+    display:flex; flex-direction:column; align-items:center; gap:6px;
+    margin-bottom: 26px;
+  }
+  .sign-line{ width: 42px; height: 1px; background: currentColor; opacity: .25; }
+  .sign-k{
+    font-size: 10.5px; letter-spacing: .34em; text-indent: .34em;
+    color: var(--c-muted); opacity: .85;
+  }
+  .sign-name{
+    font-size: 16px; font-weight: 700; letter-spacing: .14em; text-indent: .14em;
+    color: var(--c-ink);
+    padding: 6px 16px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--c-accent) 10%, transparent);
+  }
+  .watermark{
+    margin-top: 26px;
+    font-size: 12px; letter-spacing: .3em; text-indent: .3em;
+    color: var(--c-muted); opacity: .28;
+    user-select: none;
+  }
+
+  /* 画面が落ち着いている人向け */
+  @media (prefers-reduced-motion: reduce){
+    html{ scroll-behavior:auto; }
+    .reveal{ opacity:1; transform:none; transition:none; }
+    .fl,.fl2,.tw,.o1,.o2,.o3{ animation:none !important; }
+    .tapheart,.tapnote{ animation-duration:.01s; }
+  }
+
+  /* 横スクロール禁止の保険 */
+  body, html{ max-width: 100%; }
+</style>
+<noscript><style>.reveal{opacity:1 !important;transform:none !important}.fl,.fl2,.tw,.o1,.o2,.o3{animation:none !important}</style></noscript>
+</head>
+
+<body>
+<div class="progress" aria-hidden="true"><i id="bar"></i></div>
+<canvas id="dust" aria-hidden="true"
+        style="position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:1"></canvas>
+
+<!-- ============ ナビ ============ -->
+<nav class="nav" aria-label="菜单">
+  <a class="brand" href="#top" style="text-decoration:none">
+    <svg viewBox="0 0 100 60" aria-hidden="true"><use href="#s-cloud"/></svg>
+    温柔
+  </a>
+  <div class="links">
+    <a href="#features">可以做的事</a>
+    <a href="#day">一天</a>
+    <a href="#voices">她们</a>
+    <a href="#breath">呼吸</a>
+    <a href="#faq">问题</a>
+  </div>
+  <span class="spacer"></span>
+</nav>
+
+<main id="top">
+
+  <!-- ============ 01 首屏 ============ -->
+  <section class="hero">
+    <div class="hero-orn" aria-hidden="true">
+      <svg class="o1" viewBox="0 0 100 60"><use href="#s-cloud"/></svg>
+      <svg class="o2" viewBox="0 0 100 60"><use href="#s-cloud"/></svg>
+      <svg class="o3" viewBox="0 0 100 100"><use href="#s-sparkle"/></svg>
+      <svg class="o4" viewBox="0 0 100 60"><use href="#s-cloud"/></svg>
+    </div>
+    <div class="wrap">
+      <p class="kicker reveal">没有摄像头、没有追踪、也没有催你的话<span class="jp-sub">カメラなし・追跡なし・せかす言葉なし</span></p>
+      <h1 class="reveal d1" data-speak="おかえりなさい。" data-speak-zh="欢迎回来。">欢迎回来。<span class="jp-sub">おかえりなさい。</span></h1>
+      <p class="lead reveal d2">
+        这里不会催你。往下滑，它会一点点变得温柔。
+        <span class="jp-sub">ここは、あなたを急かさないサイトです。したへスクロールするほど、すこしずつ、やさしくなっていきます。</span>
+      </p>
+      <div class="row hero-actions reveal d3">
+        <a class="btn" href="#features">慢慢看看 →</a>
+        <a class="btn ghost" href="#breath">只呼吸一次</a>
+      </div>
+
+      <div class="card today reveal d3">
+        <div class="head"><span class="dot"></span>今天的你</div>
+        <div class="rows">
+          <div><b>慢慢来</b><span>心情</span></div>
+          <div><b>1 个人</b><span>在这里</span></div>
+          <div><b>∞</b><span>温柔</span></div>
+        </div>
+        <p class="tiny mt-s">今天的记录，不会发到任何地方。<span class="jp-sub">きょうのきろくは、どこにも送られません。</span></p>
+      </div>
+
+      <div class="scrollhint reveal d3" aria-hidden="true">
+        <span>往下</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
+          <path d="M12 4v14M6 13l6 6 6-6"/>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 02 来过这里的人 ============ -->
+  <section class="bands">
+    <div class="wrap center">
+      <p class="eyebrow reveal" style="justify-content:center">来过这里的人</p>
+      <p class="lead reveal d1" style="margin-inline:auto">
+        到现在，已经有 <b>12,847 个人</b> 在这里休息过一会儿。
+        <span class="jp-sub">これまでに 12,847 人が、ここでひと休みしていきました。</span>
+      </p>
+      <div class="chips mt-m reveal d2">
+        <span class="chip">小春</span><span class="chip">小澪</span><span class="chip">灯里</span>
+        <span class="chip">小悠</span><span class="chip">小樱</span><span class="chip">日向</span>
+        <span class="chip">小枫</span><span class="chip">乃亚</span><span class="chip">小律</span>
+        <span class="chip">小纺</span><span class="chip">你</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 03 可以做的事 ============ -->
+  <section id="features">
+    <div class="deco fl" style="width:88px; right:-18px; top:40px"><svg viewBox="0 0 100 100"><use href="#s-heart"/></svg></div>
+    <div class="wrap">
+      <p class="eyebrow reveal">可以做的事</p>
+      <h2 class="reveal d1">什么也不做。<span class="jp-sub">なにも、しないこと。</span></h2>
+      <p class="lead reveal d2 mt-s">
+        它能做的事很少，只是让你休息一下。
+        <span class="jp-sub">このサイトにできるのは、あなたを休ませることくらいです。</span>
+      </p>
+
+      <div class="grid three mt-l">
+        <div class="card reveal d1">
+          <svg viewBox="0 0 100 100" style="width:44px;height:44px;color:var(--c-accent);margin-bottom:12px"><use href="#s-sun"/></svg>
+          <h3>柔软的光</h3>
+          <p class="tiny mt-s">屏幕会跟着你的速度变暖。不用赶。
+            <span class="jp-sub">画面は、あなたの速さで明るくなります。</span></p>
+        </div>
+        <div class="card reveal d2">
+          <svg viewBox="0 0 100 60" style="width:52px;height:34px;color:var(--c-accent);margin-bottom:12px"><use href="#s-cloud"/></svg>
+          <h3>什么也不做的时间</h3>
+          <p class="tiny mt-s">什么都不做，也是一种很正经的休息。
+            <span class="jp-sub">なにもしないことも、立派な休息です。</span></p>
+        </div>
+        <div class="card reveal d3">
+          <svg viewBox="0 0 100 100" style="width:46px;height:46px;color:var(--c-accent);margin-bottom:12px"><use href="#s-cat"/></svg>
+          <h3>你不是一个人</h3>
+          <p class="tiny mt-s">不用回话。你不说话，我也在。
+            <span class="jp-sub">声は届かなくても、ここにいるよ。返事はいらない。</span></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 04 夕阳 ============ -->
+  <section>
+    <div class="wrap center">
+      <div class="reveal" style="position:relative;margin-inline:auto;max-width:520px">
+        <svg viewBox="0 0 400 240" style="width:100%;color:var(--c-accent)">
+          <defs>
+            <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="currentColor" stop-opacity=".10"/>
+              <stop offset="1" stop-color="currentColor" stop-opacity="0"/>
+            </linearGradient>
+          </defs>
+          <rect x="0" y="0" width="400" height="240" rx="26" fill="url(#sky)"/>
+          <circle cx="200" cy="150" r="42" fill="currentColor" opacity=".55"/>
+          <circle cx="200" cy="150" r="62" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-dasharray="2 8"/>
+          <g fill="currentColor" opacity=".35">
+            <circle cx="86" cy="72" r="16"/><circle cx="106" cy="72" r="20"/><circle cx="126" cy="72" r="13"/>
+            <circle cx="300" cy="60" r="12"/><circle cx="318" cy="60" r="16"/><circle cx="334" cy="60" r="10"/>
+          </g>
+          <g stroke="currentColor" stroke-opacity=".35" fill="none" stroke-linecap="round">
+            <path d="M60 190 q40 -10 80 0"/><path d="M260 190 q40 -10 80 0"/>
+            <path d="M150 205 q50 -8 100 0"/>
+          </g>
+        </svg>
+      </div>
+      <h2 class="reveal d1 mt-m">好像，暖了一点呢。<span class="jp-sub">すこし、あったかくなってきたね。</span></h2>
+      <p class="lead reveal d2 center" style="margin-inline:auto">
+        还不用做什么。就这样待着，也很好。
+        <span class="jp-sub">まだ、なにもしなくていいよ。</span>
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ 05 一天 ============ -->
+  <section id="day">
+    <div class="deco fl2" style="width:70px; left:-16px; top:70px"><svg viewBox="0 0 100 100"><use href="#s-flower"/></svg></div>
+    <div class="wrap">
+      <p class="eyebrow reveal">你的一天</p>
+      <h2 class="reveal d1">今天，温柔的日程表。<span class="jp-sub">きょうの、やさしい時間割。</span></h2>
+
+      <div class="tl">
+        <div class="tl-item reveal"><time>06:45</time><p>再睡一会儿也可以。<span class="jp-sub">まだ寝ていていいよ。</span></p></div>
+        <div class="tl-item reveal"><time>07:30</time><p>喝一口温水。<span class="jp-sub">白湯を、ひとくち。</span></p></div>
+        <div class="tl-item reveal"><time>12:00</time><p>吃饭了吗？没吃的话，吃一点点也好。<span class="jp-sub">ごはん、たべた？ たべてなかったら、ちょっとだけでも。</span></p></div>
+        <div class="tl-item reveal"><time>15:20</time><p>肩膀放松一下，呼——<span class="jp-sub">肩の力を、ぬいて。ふっ、て。</span></p></div>
+        <div class="tl-item reveal"><time>18:30</time><p>夕阳很好看。不看也没关系。<span class="jp-sub">夕日、きれいだよ。見なくてもいいけど。</span></p></div>
+        <div class="tl-item reveal"><time>22:30</time><p>洗澡水调温一点点。<span class="jp-sub">おふろ、ちょっとぬるめにしてね。</span></p></div>
+        <div class="tl-item reveal"><time>03:14</time><p>睡不着的夜里，我也在。<span class="jp-sub">ねむれない夜も、ここにいるよ。</span></p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 06 数字 ============ -->
+  <section>
+    <div class="wrap">
+      <p class="eyebrow reveal">今天的记录</p>
+      <h2 class="reveal d1">你今天做过的事。<span class="jp-sub">あなたが、したこと。</span></h2>
+      <div class="nums">
+        <div class="num reveal d1"><b>1,024<small style="font-size:14px"> 次</small></b><span>呼吸了</span><em class="zhnum">いきをした</em></div>
+        <div class="num reveal d2"><b>3<small style="font-size:14px"> 次</small></b><span>叹了气（这样也可以）</span><em class="zhnum">ため息をついた</em></div>
+        <div class="num reveal d1"><b>0<small style="font-size:14px"> 次</small></b><span>责备自己</span><em class="zhnum">自分を責めた</em></div>
+        <div class="num reveal d2"><b>∞</b><span>收到的温柔</span><em class="zhnum">やさしさを、うけとった</em></div>
+      </div>
+      <p class="tiny mt-m reveal d3">这些数字只是给你的，不会发给任何人。
+        <span class="jp-sub">この数字は、あなたのための数字です。だれにも送りません。</span></p>
+    </div>
+  </section>
+
+  <!-- ============ 07 三步 ============ -->
+  <section>
+    <div class="wrap">
+      <p class="eyebrow reveal">怎么用</p>
+      <h2 class="reveal d1">没有难的事。<span class="jp-sub">むずかしいことは、ありません。</span></h2>
+      <div class="grid three mt-l">
+        <div class="card reveal d1">
+          <p class="tag tiny" style="letter-spacing:.2em">01</p>
+          <h3 class="mt-s">在任何地方停下来</h3>
+          <p class="tiny mt-s">停下、往回滑，都行。<span class="jp-sub">スクロールをやめてもいいし、戻ってもいい。</span></p>
+        </div>
+        <div class="card reveal d2">
+          <p class="tag tiny" style="letter-spacing:.2em">02</p>
+          <h3 class="mt-s">吸一口气</h3>
+          <p class="tiny mt-s">用鼻子慢慢吸气，抬肩，再放下。<span class="jp-sub">鼻からゆっくり。肩を上げて、落とす。</span></p>
+        </div>
+        <div class="card reveal d3">
+          <p class="tag tiny" style="letter-spacing:.2em">03</p>
+          <h3 class="mt-s">不用再撑了</h3>
+          <p class="tiny mt-s">今天到这里，就已经够了。<span class="jp-sub">きょうはここまでで、十分です。</span></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 08 她们想对你说 ============ -->
+  <section id="voices">
+    <div class="deco tw" style="width:56px; right:8px; top:20px"><svg viewBox="0 0 100 100"><use href="#s-sparkle"/></svg></div>
+    <div class="wrap">
+      <p class="eyebrow reveal">这里有一些话</p>
+      <h2 class="reveal d1">她们，大概会这样说。<span class="jp-sub">あなたに、言いたかったこと。</span></h2>
+      <p class="lead reveal d2 mt-s">慢慢读。每一句都是给你的。
+        <span class="jp-sub">ゆっくり読んでね。ぜんぶ、あなたのための言葉です。</span></p>
+
+      <div class="grid two mt-l">
+
+        <div class="card voice reveal d1">
+          <div class="avatar">02</div>
+          <div>
+            <p>「没关系。有我在呢，对吧？」<span class="jp-sub">大丈夫。あたしがいるから、ね？</span></p>
+            <p class="name">ゼロツー · 02　《DARLING in the FRANXX》</p>
+          </div>
+        </div>
+
+        <div class="card voice reveal d2">
+          <div class="avatar">伊</div>
+          <div>
+            <p>「旅行还要继续，但今天歇一天也没关系哦。」<span class="jp-sub">旅は続くけど、今日くらいは休んでいいのよ。</span></p>
+            <p class="name">イレイナ · 伊蕾娜　《魔女の旅々》</p>
+          </div>
+        </div>
+
+        <div class="card voice reveal d1">
+          <div class="avatar">麻</div>
+          <div>
+            <p>「不用勉强。你就是你，不是吗？」<span class="jp-sub">無理しなくていい。あんたは、あんたのままでしょ。</span></p>
+            <p class="name">桜島麻衣 · 樱岛麻衣　《青春ブタ野郎》</p>
+          </div>
+        </div>
+
+        <div class="card voice reveal d2">
+          <div class="avatar">真</div>
+          <div>
+            <p>「辛苦了。我一直都看着呢。」<span class="jp-sub">おつかれさま。ちゃんと、見てたよ。</span></p>
+            <p class="name">椎名真昼 · 真昼　《お隣の天使様》</p>
+          </div>
+        </div>
+
+        <div class="card voice reveal d1">
+          <div class="avatar">海</div>
+          <div>
+            <p>「没精神的时候，就要被夸！超棒的！」<span class="jp-sub">元気ないときは、いっぱい褒める！ えらいえらい！</span></p>
+            <p class="name">喜多川海夢 · 喜多川海梦　《その着せ替え人形は恋をする》</p>
+          </div>
+        </div>
+
+        <div class="card voice reveal d2">
+          <div class="avatar">高</div>
+          <div>
+            <p>「呵呵，今天撒娇也可以哦。」<span class="jp-sub">ふふっ、今日は甘えてもいいよ。</span></p>
+            <p class="name">高木さん · 高木同学　《からかい上手の高木さん》</p>
+          </div>
+        </div>
+
+        <div class="card voice reveal d1">
+          <div class="avatar">雷</div>
+          <div>
+            <p>「雷姆，是站在你这边的。一直。」<span class="jp-sub">レムは、あなたの味方です。ずっと。</span></p>
+            <p class="name">レム · 雷姆　《Re:ゼロから始める異世界生活》</p>
+          </div>
+        </div>
+
+        <div class="card voice reveal d2">
+          <div class="avatar">亚</div>
+          <div>
+            <p>「我会在你身边。就算放下剑，也没关系。」<span class="jp-sub">一緒にいるよ。剣を置いても、ね？</span></p>
+            <p class="name">アスナ · 亚丝娜　《ソードアート・オンライン》</p>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="center mt-l reveal">
+        <button class="btn" id="onemore" type="button">再给我一句</button>
+        <p class="tiny mt-s" id="onemore-out" style="min-height:26px"></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 09 全都是给你的 ============ -->
+  <section id="wall">
+    <div class="wrap center">
+      <p class="eyebrow reveal" style="justify-content:center">一句话</p>
+      <h2 class="reveal d1">全都给你。<span class="jp-sub">ぜんぶ、あなたに。</span></h2>
+      <p class="lead reveal d2" style="margin-inline:auto">挑一句带走就好。
+        <span class="jp-sub">ひとつだけ、ひろって帰ってね。</span>
+      </p>
+      <div class="wall reveal d2" id="wallChips"><span class="chip-soft">没事的</span><span class="chip-soft">辛苦了</span><span class="chip-soft">慢慢来就好</span><span class="chip-soft">我在你身边</span><span class="chip-soft">你已经很努力了</span><span class="chip-soft">想哭就哭吧</span><span class="chip-soft">明天也见面吧</span><span class="chip-soft">睡不着也没关系</span><span class="chip-soft">按你喜欢的来</span><span class="chip-soft">你就很好</span><span class="chip-soft">别担心</span><span class="chip-soft">穿暖一点</span><span class="chip-soft">休息一下</span><span class="chip-soft">抱抱</span><span class="chip-soft">我在这里</span><span class="chip-soft">不想笑就别笑</span><span class="chip-soft">全部都很好</span><span class="chip-soft">欢迎回来</span></div>
+    </div>
+  </section>
+
+  <!-- ============ 10 猫 ============ -->
+  <section id="cozy">
+    <div class="wrap center">
+      <div class="cozy reveal" role="img" aria-label="睡着了的小猫">
+        <svg viewBox="0 0 400 270" style="width:100%;color:var(--c-accent)">
+          <ellipse cx="200" cy="242" rx="150" ry="12" fill="currentColor" opacity=".10"/>
+          <rect x="58" y="188" width="286" height="56" rx="28" fill="currentColor" opacity=".16"/>
+          <g fill="currentColor" opacity=".5">
+            <path d="M92 66l3.5 9 9 3.5-9 3.5-3.5 9-3.5-9-9-3.5 9-3.5z"/>
+            <path d="M330 150l2.5 6.5 6.5 2.5-6.5 2.5-2.5 6.5-2.5-6.5-6.5-2.5 6.5-2.5z" opacity=".8"/>
+            <path d="M140 44l2 5 5 2-5 2-2 5-2-5-5-2 5-2z" opacity=".7"/>
+          </g>
+          <g fill="currentColor" opacity=".42" font-family="serif">
+            <text x="318" y="104" font-size="21">z</text>
+            <text x="336" y="86" font-size="15">z</text>
+            <text x="350" y="72" font-size="11">z</text>
+          </g>
+          <path d="M284 214q40 4 36 -28q-3 -22 -26 -16" fill="none" stroke="currentColor" stroke-width="11" stroke-linecap="round" opacity=".8"/>
+          <path d="M126 216q-4 -78 74 -78q78 0 74 78z" fill="currentColor" opacity=".9"/>
+          <path d="M118 168l-6 -34 34 17z" fill="currentColor" opacity=".9"/>
+          <path d="M184 166l6 -33 -34 17z" fill="currentColor" opacity=".9"/>
+          <circle cx="150" cy="178" r="35" fill="currentColor"/>
+          <g stroke="#fff" stroke-width="3.2" fill="none" stroke-linecap="round" opacity=".95">
+            <path d="M134 176q6 7 13 0"/><path d="M155 176q6 7 13 0"/>
+            <path d="M146 192q5 5 10 0"/>
+          </g>
+          <circle cx="124" cy="192" r="7" fill="#fff" opacity=".26"/>
+          <circle cx="176" cy="192" r="7" fill="#fff" opacity=".26"/>
+          <g stroke="currentColor" stroke-width="1.6" stroke-linecap="round" opacity=".45">
+            <path d="M112 178h-17M114 187l-16 5M188 178h17M186 187l16 5"/>
+          </g>
+        </svg>
+      </div>
+      <h2 class="reveal d1 mt-m" data-speak="おやすみなさい。ねこが、となりで寝てるよ。" data-speak-zh="晚安。小猫就睡在你旁边哦。">晚安。<span class="jp-sub">おやすみなさい。</span></h2>
+      <p class="lead reveal d2" style="margin-inline:auto">
+        睡不着的夜里，就在这里闭上眼睛吧。小猫睡在你旁边。
+        <span class="jp-sub">ねむれない夜は、ここで目を閉じて。ねこが、となりで寝てるよ。</span>
+      </p>
+      <p class="tiny reveal d3 mt-s">（摸摸猫也可以）</p>
+    </div>
+  </section>
+
+  <!-- ============ 11 关于你的事 ============ -->
+  <section>
+    <div class="wrap">
+      <p class="eyebrow reveal">关于你的事</p>
+      <h2 class="reveal d1">不会告诉任何人。<span class="jp-sub">だれにも、言いません。</span></h2>
+      <div class="grid three mt-l">
+        <div class="card reveal d1"><h3>不记录</h3><p class="tiny mt-s">你看了哪里、停留多久，都不记。
+          <span class="jp-sub">どこを読んだかも、何秒いたかも。</span></p></div>
+        <div class="card reveal d2"><h3>不上传</h3><p class="tiny mt-s">整个网站就一个文件，不给外面发任何东西。
+          <span class="jp-sub">このページは 1 つのファイル。外に何も送りません。</span></p></div>
+        <div class="card reveal d3"><h3>忘了也没关系</h3><p class="tiny mt-s">关掉就结束了。想回来的时候，再来。
+          <span class="jp-sub">閉じたら、それでおしまい。また来たくなったら、どうぞ。</span></p></div>
+      </div>
+      <p class="tiny mt-m reveal">你的名字、位置、还有心事，它都不知道。
+        <span class="jp-sub">※ 名前も、場所も、こころも、ぜんぶ知りません。</span></p>
+    </div>
+  </section>
+
+  <!-- ============ 12 呼吸 ============ -->
+  <section id="breath">
+    <div class="deco fl" style="width:64px; left:-10px; bottom:30px"><svg viewBox="0 0 100 100"><use href="#s-cloud"/></svg></div>
+    <div class="wrap center">
+      <p class="eyebrow reveal" style="justify-content:center">一起</p>
+      <h2 class="reveal d1" data-speak="いっしょに、いきをしよう。すって、とめて、はいて。" data-speak-zh="一起呼吸吧。吸气、停住、呼气。">一起，呼吸吧。<span class="jp-sub">いきを、しよう。</span></h2>
+      <p class="lead reveal d2" style="margin-inline:auto">圆圈变大时吸气，停一下，变小的时候呼气。
+        <span class="jp-sub">まるが大きくなったら吸って、止めて、小さくなったら吐く。</span>
+      </p>
+
+      <div class="breath-wrap">
+        <button class="breath" id="breathBtn" type="button" aria-label="开始呼吸">
+          <span class="halo"></span><span class="ring"></span><span class="ring2"></span>
+          <span class="label" id="breathLabel">点一下，开始<small>tap to start</small></span>
+        </button>
+        <p class="tiny" id="breathHint" style="min-height:22px">4 秒吸气 · 4 秒停住 · 6 秒呼气</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 13 免费 ============ -->
+  <section id="price">
+    <div class="deco fl" style="width:52px;right:-6px;top:26px"><svg viewBox="0 0 100 100"><use href="#s-heart"/></svg></div>
+    <div class="wrap">
+      <p class="eyebrow reveal">关于钱</p>
+      <h2 class="reveal d1">全部免费。<span class="jp-sub">ぜんぶ、無料です。</span></h2>
+      <p class="lead reveal d2 mt-s">没有加价，没有解约，没有一行小字。
+        <span class="jp-sub">ここには、追加料金も、解約も、小さい文字もありません。</span></p>
+      <div class="grid three mt-l">
+        <div class="card price reveal d1"><p class="tag">free</p><b>¥0</b><p class="tiny mt-s">一直都能用</p>
+          <p class="tiny" style="color:var(--c-muted)">什么时候来都行</p></div>
+        <div class="card price reveal d2"><p class="tag">温柔</p><b>¥0</b><p class="tiny mt-s">没有额外收费</p>
+          <p class="tiny" style="color:var(--c-muted)">不用勉强坚持</p></div>
+        <div class="card price reveal d3"><p class="tag">全部</p><b>¥0</b><p class="tiny mt-s">这里所有的东西</p>
+          <p class="tiny" style="color:var(--c-muted)">也有一份是你的</p></div>
+      </div>
+      <div class="center mt-l reveal"><button class="btn" id="receive" type="button">收下</button></div>
+    </div>
+  </section>
+
+  <!-- ============ 14 三个小提示 ============ -->
+  <section id="tips">
+    <div class="deco fl2" style="width:46px;left:-8px;top:40px"><svg viewBox="0 0 100 100"><use href="#s-flower"/></svg></div>
+    <div class="wrap">
+      <p class="eyebrow reveal">小小的提示</p>
+      <h2 class="reveal d1">今天，只做三件小事。<span class="jp-sub">きょうの、たった 3 つ。</span></h2>
+      <div class="grid mt-l">
+        <div class="card reveal d1"><p class="tiny" style="color:var(--c-accent);letter-spacing:.12em">睡眠 · 3 分钟</p>
+          <h3 class="mt-s">只躺五分钟</h3>
+          <p class="tiny mt-s">不用睡着。躺一会儿，身体就在恢复。<span class="jp-sub">寝なくていい。横になるだけで、体は休みます。</span></p></div>
+        <div class="card reveal d2"><p class="tiny" style="color:var(--c-accent);letter-spacing:.12em">洗澡 · 6 分钟</p>
+          <h3 class="mt-s">水温调低一点</h3>
+          <p class="tiny mt-s">太烫反而更累，温一点刚好。<span class="jp-sub">熱すぎると、かえって疲れます。</span></p></div>
+        <div class="card reveal d3"><p class="tiny" style="color:var(--c-accent);letter-spacing:.12em">回复 · ∞</p>
+          <h3 class="mt-s">消息明天再回也行</h3>
+          <p class="tiny mt-s">不回也没关系。<span class="jp-sub">すぐ返さなくても、だいじょうぶ。</span></p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 15 小伙伴 ============ -->
+  <section id="team">
+    <div class="wrap center">
+      <p class="eyebrow reveal" style="justify-content:center">这里的伙伴</p>
+      <h2 class="reveal d1">小小的伙伴们。<span class="jp-sub">ちいさな、なかまたち。</span></h2>
+      <p class="lead reveal d2" style="margin-inline:auto">这里最厉害的那几位，看起来都很困。
+        <span class="jp-sub">いちばんえらいのは、いつも眠そうです。</span></p>
+      <div class="team">
+        <div class="card reveal d1"><svg viewBox="0 0 100 100"><use href="#s-cat"/></svg><b>咪</b><span>睡眠担当</span></div>
+        <div class="card reveal d2"><svg viewBox="0 0 100 100"><use href="#s-bunny"/></svg><b>小白</b><span>倾听担当</span></div>
+        <div class="card reveal d3"><svg viewBox="0 0 100 100"><use href="#s-bear"/></svg><b>小熊</b><span>抱抱担当</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 16 常见的问题 ============ -->
+  <section id="faq">
+    <div class="deco tw" style="width:40px;right:6px;top:24px"><svg viewBox="0 0 100 100"><use href="#s-sparkle"/></svg></div>
+    <div class="wrap">
+      <p class="eyebrow reveal">问题</p>
+      <h2 class="reveal d1">常见的问题。<span class="jp-sub">よくある、しつもん。</span></h2>
+      <div class="mt-m">
+        <details class="reveal" open>
+          <summary>一定要一直看着吗？</summary>
+          <p>不用。随时关掉都行，你的时间更重要。<span class="jp-sub">だめじゃないよ。いつでも閉じていい。あなたの時間のほうが、だいじ。</span></p>
+        </details>
+        <details class="reveal">
+          <summary>会给我推送什么吗？</summary>
+          <p>不会。这个页面就是一个文件，断网也能打开。<span class="jp-sub">なにも。このページは 1 つのファイルで、外に何も送りません。</span></p>
+        </details>
+        <details class="reveal">
+          <summary>我是不是很差劲？</summary>
+          <p>不是的。你只是有点累了。累了，就先休息。<span class="jp-sub">ちがうよ。ただ、ちょっと疲れてるだけ。</span></p>
+        </details>
+        <details class="reveal">
+          <summary>笑不出来的时候呢？</summary>
+          <p>不想笑就别笑。在这里，不用勉强自己笑。<span class="jp-sub">笑わなくていいよ。ここでは、無理に笑わなくていいの。</span></p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 17 留言 ============ -->
+  <section id="note">
+    <div class="deco fl" style="width:50px;right:-10px;bottom:36px"><svg viewBox="0 0 100 100"><use href="#s-cat"/></svg></div>
+    <div class="wrap">
+      <p class="eyebrow reveal">放在这里</p>
+      <h2 class="reveal d1">说不出口的话，放在这里。<span class="jp-sub">言えないことは、ここに。</span></h2>
+      <p class="lead reveal d2 mt-s">写下来，收起来。不会发给任何人。
+        <span class="jp-sub">書いて、しまうだけ。だれにも届きません。</span></p>
+      <div class="post reveal d2">
+        <textarea id="note" placeholder="现在的心情，什么都可以。不想写也没关系。"></textarea>
+        <div class="row">
+          <button class="btn small" id="keep" type="button">收起来</button>
+          <span class="reply" id="keepReply"></span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 18 最后 ============ -->
+  <section id="end" style="padding-bottom: clamp(70px, 14vw, 130px)">
+    <div class="deco tw" style="width:46px; right:12px; top:0"><svg viewBox="0 0 100 100"><use href="#s-star"/></svg></div>
+    <div class="wrap center">
+      <svg class="reveal" viewBox="0 0 100 100" style="width:84px;height:84px;margin:0 auto;color:var(--c-accent)"><use href="#s-heart"/></svg>
+      <h2 class="reveal d1 mt-m" data-speak="ここまで、来てくれたんだね。えらいね。ぎゅっ。" data-speak-zh="你走到这里了呢。真棒，抱抱。">你走到这里了呢。<span class="jp-sub">ここまで、来てくれたんだね。</span></h2>
+      <p class="lead reveal d2" style="margin-inline:auto">
+        真棒。抱一下。想回来的时候，随时回来。
+        <span class="jp-sub">えらいね。ぎゅっ。また、いつでもおいで。</span>
+      </p>
+      <div class="phrases reveal d3">
+        <span class="chip">没事的</span><span class="chip">慢慢来就好</span>
+        <span class="chip">你就很好</span><span class="chip">辛苦了</span>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="sign reveal">
+    <span class="sign-line"></span>
+    <p class="sign-k">作者</p>
+    <p class="sign-name">斗志昂扬说假话的大肥鱼</p>
+    <span class="sign-line"></span>
+  </div>
+
+  <p class="heartline reveal">© 2026 温柔 — 这里，是为你准备的地方。</p>
+  <p class="tiny reveal" style="margin-top:4px">このサイトはフィクションです。でも、このやさしさは、ほんものです。</p>
+  <p class="tiny reveal" style="opacity:.75">一个文件就能运行。断网也没关系。</p>
+  <p class="watermark reveal" aria-hidden="true">斗志昂扬说假话的大肥鱼</p>
+</footer>
+
+<!-- ============ 絵（すべてインライン SVG） ============ -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="s-cloud" viewBox="0 0 100 60">
+    <path fill="currentColor" d="M24 46c-9 0-14-5-14-12s5.5-12 13-12c1.6-8 8.2-13 16-13 8.6 0 15.4 6 16.8 14 2-.7 3.6-1 5.2-1 7.2 0 12 5 12 12s-5 12-12 12H24z"/>
+  </symbol>
+  <symbol id="s-sun" viewBox="0 0 100 100">
+    <circle cx="50" cy="50" r="20" fill="currentColor"/>
+    <g stroke="currentColor" stroke-width="4" stroke-linecap="round" opacity=".7">
+      <path d="M50 12v10M50 78v10M12 50h10M78 50h10M23 23l7 7M70 70l7 7M77 23l-7 7M30 70l-7 7"/>
+    </g>
+  </symbol>
+  <symbol id="s-star" viewBox="0 0 100 100">
+    <path fill="currentColor" d="M50 8l9 26 26 9-26 9-9 26-9-26-26-9 26-9z" opacity=".95"/>
+  </symbol>
+  <symbol id="s-sparkle" viewBox="0 0 100 100">
+    <path fill="currentColor" d="M50 10c3 20 10 27 30 30-20 3-27 10-30 30-3-20-10-27-30-30 20-3 27-10 30-30z"/>
+  </symbol>
+  <symbol id="s-heart" viewBox="0 0 100 100">
+    <path fill="currentColor" d="M50 84S14 62 14 40a20 20 0 0136-11 20 20 0 0136 11c0 22-36 44-36 44z"/>
+  </symbol>
+  <symbol id="s-cat" viewBox="0 0 100 100">
+    <path fill="currentColor" d="M22 34l-2-16 16 8a30 30 0 0128 0l16-8-2 16a26 26 0 011 8v14a24 24 0 01-24 24H45a24 24 0 01-24-24V42a26 26 0 011-8z" opacity=".92"/>
+    <circle cx="38" cy="52" r="3.6" fill="#fff"/>
+    <circle cx="62" cy="52" r="3.6" fill="#fff"/>
+    <path d="M46 64q4 4 8 0" stroke="#fff" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+    <circle cx="30" cy="60" r="4" fill="#fff" opacity=".45"/>
+    <circle cx="70" cy="60" r="4" fill="#fff" opacity=".45"/>
+  </symbol>
+  <symbol id="s-bear" viewBox="0 0 100 100">
+    <circle cx="26" cy="26" r="12" fill="currentColor" opacity=".8"/>
+    <circle cx="74" cy="26" r="12" fill="currentColor" opacity=".8"/>
+    <circle cx="50" cy="54" r="30" fill="currentColor" opacity=".92"/>
+    <circle cx="39" cy="50" r="3.6" fill="#fff"/><circle cx="61" cy="50" r="3.6" fill="#fff"/>
+    <ellipse cx="50" cy="62" rx="8" ry="6" fill="#fff" opacity=".85"/>
+    <circle cx="50" cy="60" r="3" fill="currentColor"/>
+  </symbol>
+  <symbol id="s-bunny" viewBox="0 0 100 100">
+    <ellipse cx="38" cy="24" rx="9" ry="20" fill="currentColor" opacity=".75"/>
+    <ellipse cx="62" cy="24" rx="9" ry="20" fill="currentColor" opacity=".75"/>
+    <circle cx="50" cy="60" r="26" fill="currentColor" opacity=".92"/>
+    <circle cx="40" cy="57" r="3.4" fill="#fff"/><circle cx="60" cy="57" r="3.4" fill="#fff"/>
+    <path d="M46 68q4 4 8 0" stroke="#fff" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+    <circle cx="32" cy="66" r="3.6" fill="#fff" opacity=".45"/><circle cx="68" cy="66" r="3.6" fill="#fff" opacity=".45"/>
+  </symbol>
+  <symbol id="s-peach" viewBox="0 0 100 100">
+    <path fill="currentColor" d="M50 88c-19 0-32-15-32-34 0-15 10-26 22-26 5 0 8 2 10 5 2-3 5-5 10-5 12 0 22 11 22 26 0 19-13 34-32 34z" opacity=".92"/>
+    <path d="M52 28c2-8 8-12 16-12-1 8-6 12-16 12z" fill="currentColor" opacity=".55"/>
+  </symbol>
+  <symbol id="s-flower" viewBox="0 0 100 100">
+    <g fill="currentColor" opacity=".85">
+      <circle cx="50" cy="26" r="13"/><circle cx="74" cy="44" r="13"/><circle cx="65" cy="72" r="13"/>
+      <circle cx="35" cy="72" r="13"/><circle cx="26" cy="44" r="13"/>
+    </g>
+    <circle cx="50" cy="52" r="11" fill="#fff" opacity=".9"/>
+  </symbol>
+  <symbol id="s-cup" viewBox="0 0 100 100">
+    <path fill="currentColor" d="M26 40h40v26a14 14 0 01-14 14H40a14 14 0 01-14-14z" opacity=".9"/>
+    <path d="M66 46h6a10 10 0 010 20h-6" fill="none" stroke="currentColor" stroke-width="5"/>
+    <g stroke="currentColor" stroke-width="3.4" stroke-linecap="round" opacity=".55" fill="none">
+      <path d="M38 30c0-5 5-5 5-10M50 30c0-5 5-5 5-10"/>
+    </g>
+  </symbol>
+</svg>
+
+<script>
+(function(){
+  "use strict";
+  var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var root = document.documentElement;
+
+  /* ---------------- 1. スクロールで「やさしく」なる ---------------- */
+  var stops = [
+    { p:0.00, bg:[238,242,246], ink:[42,51,64],  card:[255,255,255], accent:[100,117,138], soft:[216,224,232], nav:[255,255,255] },
+    { p:0.16, bg:[250,246,240], ink:[58,51,48],  card:[255,252,247], accent:[201,154,122], soft:[233,221,207], nav:[255,253,250] },
+    { p:0.38, bg:[255,243,235], ink:[74,55,48],  card:[255,250,245], accent:[234,158,140], soft:[247,214,198], nav:[255,251,247] },
+    { p:0.60, bg:[255,238,243], ink:[77,50,66],  card:[255,248,251], accent:[240,143,168], soft:[250,206,220], nav:[255,250,252] },
+    { p:0.80, bg:[255,240,235], ink:[80,52,58],  card:[255,249,246], accent:[236,150,132], soft:[248,212,196], nav:[255,251,248] },
+    { p:1.00, bg:[255,246,250], ink:[70,44,62],  card:[255,252,254], accent:[232,140,175], soft:[250,214,232], nav:[255,252,254] }
+  ];
+  function lerp(a,b,t){ return a + (b-a)*t; }
+  function mix(c1,c2,t){ return "rgb(" + Math.round(lerp(c1[0],c2[0],t)) + "," + Math.round(lerp(c1[1],c2[1],t)) + "," + Math.round(lerp(c1[2],c2[2],t)) + ")"; }
+  function palette(p){
+    var i = 0;
+    while (i < stops.length-2 && p > stops[i+1].p) i++;
+    var a = stops[i], b = stops[i+1];
+    var t = (p - a.p) / (b.p - a.p);
+    t = Math.max(0, Math.min(1, t));
+    return {
+      bg: mix(a.bg,b.bg,t), ink: mix(a.ink,b.ink,t), card: mix(a.card,b.card,t),
+      accent: mix(a.accent,b.accent,t), soft: mix(a.soft,b.soft,t), nav: mix(a.nav,b.nav,t)
+    };
+  }
+
+  var bar = document.getElementById("bar");
+  var lastP = -1, queued = false;
+
+  function paint(){
+    queued = false;
+    var doc = document.documentElement;
+    var max = (doc.scrollHeight - window.innerHeight) || 1;
+    var p = Math.min(1, Math.max(0, window.scrollY / max));
+    if (Math.abs(p - lastP) < 0.0015) return;
+    lastP = p;
+    var c = palette(p);
+    root.style.setProperty("--p", p.toFixed(4));
+    root.style.setProperty("--cute", Math.min(1, Math.max(0, (p - 0.12) / 0.72)).toFixed(4));
+    root.style.setProperty("--c-bg", c.bg);
+    root.style.setProperty("--c-ink", c.ink);
+    root.style.setProperty("--c-card", c.card);
+    root.style.setProperty("--c-accent", c.accent);
+    root.style.setProperty("--c-soft", c.soft);
+    root.style.setProperty("--nav-bg", "rgba(" + c.nav.replace(/[^0-9,]/g,"") + ",.72)");
+    root.style.setProperty("--c-line", "rgba(" + c.ink.replace(/[^0-9,]/g,"") + ",.12)");
+    root.style.setProperty("--shadow", "0 18px 50px rgba(" + c.ink.replace(/[^0-9,]/g,"") + ",.10)");
+    var meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute("content", c.bg);
+    if (bar) bar.style.width = (p*100).toFixed(2) + "%";
+    updateDust(p);
+  }
+  function onScroll(){
+    if (!queued){ queued = true; requestAnimationFrame(paint); }
+  }
+  window.addEventListener("scroll", onScroll, { passive:true });
+  window.addEventListener("resize", onScroll);
+  /* 予備：スクロールイベントが飛ばない環境でも、ゆっくり追いつく */
+  setInterval(paint, 500);
+
+  /* ---------------- 2. 出現アニメ ---------------- */
+  var reveals = document.querySelectorAll(".reveal");
+  if ("IntersectionObserver" in window && !reduce){
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){
+        if (e.isIntersecting){ e.target.classList.add("in"); io.unobserve(e.target); }
+      });
+    }, { rootMargin: "0px 0px -8% 0px", threshold: 0.12 });
+    reveals.forEach(function(el){ io.observe(el); });
+  } else {
+    reveals.forEach(function(el){ el.classList.add("in"); });
+  }
+  /* 万一表示が止まったときの保険（3 秒後にまだ何も出ていなければ全部表示） */
+  setTimeout(function(){
+    if (!document.querySelectorAll(".reveal.in").length){
+      reveals.forEach(function(el){ el.classList.add("in"); });
+    }
+  }, 3000);
+  window.addEventListener("error", function(){
+    document.querySelectorAll(".reveal").forEach(function(el){ el.classList.add("in"); });
+  });
+
+  /* ---------------- 3. ちいさな光（Canvas） ---------------- */
+  var cvs = document.getElementById("dust");
+  var ctx = cvs.getContext("2d");
+  var W = 0, H = 0, DPR = 1, parts = [], curP = 0;
+
+  function resize(){
+    DPR = Math.min(2, window.devicePixelRatio || 1);
+    W = cvs.clientWidth; H = cvs.clientHeight;
+    cvs.width = Math.round(W * DPR); cvs.height = Math.round(H * DPR);
+    ctx.setTransform(DPR,0,0,DPR,0,0);
+  }
+  function makeParticle(){
+    return {
+      x: Math.random()*W, y: Math.random()*H,
+      r: 1 + Math.random()*2.4,
+      vy: -0.12 - Math.random()*0.42,
+      vx: (Math.random()-0.5)*0.22,
+      a: 0.10 + Math.random()*0.35,
+      ph: Math.random()*Math.PI*2,
+      kind: Math.random()
+    };
+  }
+  function targetCount(p){ return Math.round(10 + p*62); }
+  function updateDust(p){
+    curP = p;
+    var want = reduce ? Math.round(10 + p*16) : targetCount(p);
+    while (parts.length < want) parts.push(makeParticle());
+    while (parts.length > want) parts.pop();
+  }
+  var t = 0, lastY = -1;
+  function draw(){
+    t += 0.016;
+    if (window.scrollY !== lastY){ lastY = window.scrollY; paint(); }
+    ctx.clearRect(0,0,W,H);
+    var accent = getComputedStyle(root).getPropertyValue("--c-accent").trim() || "rgb(200,140,150)";
+    ctx.fillStyle = accent;
+    for (var i=0;i<parts.length;i++){
+      var q = parts[i];
+      q.y += q.vy; q.x += q.vx + Math.sin(t*0.6 + q.ph)*0.16;
+      if (q.y < -20){ q.y = H + 20; q.x = Math.random()*W; }
+      if (q.x < -20) q.x = W + 20;
+      if (q.x > W + 20) q.x = -20;
+      ctx.globalAlpha = q.a * (0.55 + 0.45*Math.sin(t + q.ph));
+      if (q.kind < curP * 0.75){
+        // 遅くなってきたら、ちいさな心
+        ctx.font = (q.r*7).toFixed(1) + "px serif";
+        ctx.fillText("♡", q.x, q.y);
+      } else {
+        ctx.beginPath(); ctx.arc(q.x, q.y, q.r, 0, Math.PI*2); ctx.fill();
+      }
+    }
+    ctx.globalAlpha = 1;
+    requestAnimationFrame(draw);
+  }
+  resize(); updateDust(0); draw();
+  window.addEventListener("resize", function(){ resize(); });
+
+  /* ---------------- 4. タップで、ちいさな言葉 ---------------- */
+  var notes = [
+    ["だいじょうぶ。", "没事的。"], ["おつかれさま。", "辛苦了。"], ["ゆっくりでいいよ。", "慢慢来就好。"],
+    ["ここにいるよ。", "我在这里。"], ["よくがんばったね。", "你已经很努力了。"], ["すきなように、していいよ。", "按你喜欢的方式做就好。"],
+    ["いきを、すって。", "吸一口气。"], ["あたたかくしてね。", "要穿暖一点。"], ["あなたでいいんだよ。", "你就很好。"]
+  ];
+  var noteIdx = 0;
+  document.addEventListener("pointerdown", function(ev){
+    if (ev.target.closest("a,button,input,textarea,summary,details")) return;
+    var h = document.createElement("span");
+    h.className = "tapheart";
+    h.textContent = "♡";
+    h.style.left = (ev.clientX - 10) + "px";
+    h.style.top = (ev.clientY - 14) + "px";
+    document.body.appendChild(h);
+    setTimeout(function(){ h.remove(); }, 1900);
+
+    if (Math.random() < 0.4){
+      var n = document.createElement("div");
+      n.className = "tapnote";
+      var pair = notes[noteIdx++ % notes.length];
+      n.textContent = pair[1];
+      n.style.left = Math.min(window.innerWidth - 190, Math.max(12, ev.clientX - 40)) + "px";
+      n.style.top = (ev.clientY - 44) + "px";
+      document.body.appendChild(n);
+      setTimeout(function(){ n.remove(); }, 2700);
+    }
+  }, { passive:true });
+
+  /* ---------------- 5. 呼吸 ---------------- */
+  var bBtn = document.getElementById("breathBtn");
+  var bLabel = document.getElementById("breathLabel");
+  var bHint = document.getElementById("breathHint");
+  var breathe = false, timers = [];
+
+  function clearTimers(){ timers.forEach(clearTimeout); timers = []; }
+  function scale(el, v){ el.style.setProperty("--s", v); }
+
+  function setScale(s){
+    bBtn.querySelector(".halo").style.transform = "scale(" + s + ")";
+    bBtn.querySelector(".ring").style.transform = "scale(" + (s + 0.06) + ")";
+    bBtn.querySelector(".ring2").style.transform = "scale(" + s + ")";
+  }
+
+  function cycle(){
+    if (!breathe) return;
+    setScale(1);
+    bLabel.innerHTML = "吸气…<small>すって</small>";
+    bHint.textContent = "4 秒";
+    timers.push(setTimeout(function(){
+      if (!breathe) return;
+      bLabel.innerHTML = "停一下…<small>とめて</small>";
+      bHint.textContent = "4 秒";
+      timers.push(setTimeout(function(){
+        if (!breathe) return;
+        setScale(.62);
+        bLabel.innerHTML = "呼气…<small>はいて</small>";
+        bHint.textContent = "6 秒";
+        timers.push(setTimeout(function(){ cycle(); }, 6000));
+      }, 4000));
+    }, 4000));
+  }
+
+  bBtn.addEventListener("click", function(){
+    breathe = !breathe;
+    clearTimers();
+    if (breathe){
+      cycle();
+    } else {
+      setScale(.72);
+      bLabel.innerHTML = "点一下，开始<small>start</small>";
+      bHint.textContent = "4 秒吸气 · 4 秒停住 · 6 秒呼气";
+    }
+  });
+
+  /* ---------------- 6. もういっこ ---------------- */
+  var more = [
+    ["「つかれたら、つかれたって言っていいんだよ。」", "累了的话，说累也没关系。"],
+    ["「なんにもしない日は、生きてるだけで百点満点。」", "什么都不做的日子，光是活着就是满分。"],
+    ["「あなたの名前、呼んでもいい？ ……呼んだよ。」", "可以叫你的名字吗？……我叫了哦。"],
+    ["「まわりと比べなくていいの。あなたはあなたでしょ。」", "不用和别人比较，你是你呀。"],
+    ["「うまくいかない日は、うまくいかないままでいいよ。」", "不顺的日子，就让它不顺吧。"],
+    ["「手、つなご？ ちょっとだけ、あったかいよ。」", "牵手吗？只有一点点，很暖哦。"],
+    ["「あしたのあなたも、きっとだいじょうぶ。」", "明天的你，也一定没事的。"],
+    ["「きょうのあなたも、ちゃんとえらい。」", "今天的你，也很了不起。"],
+    ["「ここは、あなたを責めない場所だよ。」", "这里不会责怪你。"],
+    ["「ごはん、たべた？ ちょっとだけでも、たべてね。」", "吃饭了吗？吃一点点也好。"],
+    ["「息を吸って、はいて。それだけで、今日は合格。」", "吸气、呼气。这样就及格了。"],
+    ["「だれにも言えないこと、ここに置いていっていいよ。」", "说不出口的事，放在这里就好。"],
+    ["「あなたが笑うと、ちょっとだけ世界が明るくなるよ。」", "你笑的时候，世界会亮一点点。"],
+    ["「ねむれない夜は、わたしも起きてるよ。」", "睡不着的夜里，我也醒着。"],
+    ["「あなたのペースで、ゆっくりでいいんだよ。」", "按你的节奏，慢慢来就好。"],
+    ["「ぎゅーってしてあげる。それだけで、いいの。」", "抱抱你。这样就够了。"]
+  ];
+  var moreOut = document.getElementById("onemore-out");
+  var moreIdx = 0;
+  document.getElementById("onemore").addEventListener("click", function(){
+    moreIdx = Math.floor(Math.random()*more.length) + 1;
+    var pair = more[moreIdx - 1];
+    moreOut.textContent = pair[1];
+    moreOut.style.animation = "none";
+    void moreOut.offsetWidth;
+    moreOut.style.animation = "popIn .5s ease-out";
+  });
+
+  /* ---------------- 7. うけとる ---------------- */
+  document.getElementById("receive").addEventListener("click", function(){
+    for (var i=0;i<14;i++){
+      (function(i){
+        setTimeout(function(){
+          var h = document.createElement("span");
+          h.className = "tapheart";
+          h.textContent = "♡";
+          h.style.left = (window.innerWidth/2 + (Math.random()-0.5)*180) + "px";
+          h.style.top = (window.innerHeight*0.6 + (Math.random()-0.5)*80) + "px";
+          h.style.fontSize = (14 + Math.random()*20).toFixed(0) + "px";
+          document.body.appendChild(h);
+          setTimeout(function(){ h.remove(); }, 1900);
+        }, i*70);
+      })(i);
+    }
+    this.textContent = "どういたしまして ♡";
+  });
+
+  /* ---------------- 8. ことばのポスト ---------------- */
+  var keep = document.getElementById("keep");
+  var reply = document.getElementById("keepReply");
+  var note = document.getElementById("note");
+  keep.addEventListener("click", function(){
+    if (!note.value.trim()){
+      reply.textContent = "什么都没写也没关系。";
+      return;
+    }
+    reply.textContent = "收好了。不会给任何人看。";
+    note.value = "";
+  });
+
+
+  /* ---------------- 10. ハッシュで直接ジャンプ（共有用） ---------------- */
+  window.addEventListener("load", function(){
+    paint();
+    if (location.hash){
+      var el = document.querySelector(location.hash);
+      if (el) setTimeout(function(){ el.scrollIntoView({ behavior:"auto", block:"start" }); }, 60);
+    }
+  });
+  paint();
+})();
+</script>
+</body>
+</html>
